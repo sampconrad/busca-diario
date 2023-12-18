@@ -1,7 +1,8 @@
 <p align="center">
-  <img width="720" height="400" src="./logo.svg">
+  <img width="540" height="300" src="./logo.svg">
 </p>
-# Sobre
+
+## Sobre
 
 Programa que busca uma lista de nomes das Partes Processuais nos PDFs do Diário Oficial.
 
