@@ -1,0 +1,3 @@
+# Ignore build & dist
+build/
+dist/
