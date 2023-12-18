@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['BuscaDiario.py'],
+    ['buscadiario.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -21,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='BuscaDiario',
+    name='buscadiario',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

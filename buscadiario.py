@@ -1,10 +1,8 @@
 import os
 import fitz
 import re
-import time
 from unidecode import unidecode
 import tkinter as tk
-from tkinter import messagebox
 import PySimpleGUI as sg
 
 root = tk.Tk()
@@ -14,11 +12,11 @@ def remove_accents(input_str):
     return unidecode(input_str)
 
 def create_nomes_file(nomes_file_path):
-   with open(nomes_file_path, 'r', encoding='utf-8') as nomes_file:
+   with open(nomes_file_path, 'a+', encoding='utf-8') as nomes_file:
+       if not os.path.getsize(nomes_file_path):
+           nomes_file.write('FULANO DE SOUZA, CICLANO DA SILVA, BELTRANO DOS SANTOS')
        nomes_content = nomes_file.read()
    return nomes_content
-
-nomes_content = create_nomes_file('nomes.txt')
 
 def read_names_from_file(names_file):
     with open(names_file, 'r', encoding='utf-8') as names_file:
@@ -68,7 +66,7 @@ def main_window():
         [sg.Button('Buscar', **scan_btn, pad=(3, 30))],
     ]
 
-    window = sg.Window('PDF Scanner', layout, finalize=True)
+    window = sg.Window('Busca Diario', layout, finalize=True)
 
     while True:
         event, values = window.read()
