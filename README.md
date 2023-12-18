@@ -1,4 +1,7 @@
-# Busca Diario
+<p align="center">
+  <img width="512" height="128" src="./logo.png">
+</p>
+# Sobre
 
 Programa que busca uma lista de nomes das Partes Processuais nos PDFs do Diário Oficial.
 
@@ -18,4 +21,5 @@ O código-fonte pode ser encontrado em ![buscadiario.py](./buscadiario.py).
 
 ## Guia de Utilização
 
-![preview](./preview.png)
+![preview1](./preview1.png)
+![preview2](./preview2.png)
