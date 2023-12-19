@@ -24,3 +24,4 @@ O código-fonte pode ser encontrado em ![buscadiario.py](./buscadiario.py).
 
 ![preview1](./preview1.png)
 ![preview2](./preview2.png)
+![preview3](./preview3.png)

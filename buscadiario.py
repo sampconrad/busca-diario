@@ -53,20 +53,23 @@ def main_window():
         create_nomes_file(nomes_file_path)
     names = read_names_from_file(nomes_file_path)
 
-    scan_btn = {'size':(64,2), 'button_color':("white","#F4564F"), "font":("Arial", 12, "bold")}
-    browse_btn = {'size':(64,2), 'button_color':("white","#0072B1"), "font":("Arial", 12, "bold")}
-    base_btn = {'size':(25,1), 'button_color':("white","#0072B1"), "font":("Arial", 10, "bold")}
+
+    browse_btn = {'size':(20,1), 'button_color':("black","#00ffaa"), "font":("Arial", 10, "bold")}
+    base_btn = {'size':(10,1), 'button_color':("black","#ffffff"), "font":("Arial", 10, "bold")}
+    scan_btn = {'size':(20,2), 'button_color':("white","#F4564F"), "font":("Arial", 12, "bold")}
 
     layout = [
-        [sg.Input(key='-FILES-', enable_events=True, visible=False), sg.FilesBrowse('Selecionar Diários PDF', **browse_btn, target='-FILES-', file_types=(("PDF Files", "*.pdf"),))],
-        [sg.Listbox(values=[], key='-SELECTED_FILES-', size=(90, 5))],
-        [sg.Text('Nomes a serem buscados:')],
-        [sg.Listbox(values=names, key='-NAMES-', size=(90, 20), enable_events=True)],
-        [sg.Button('Adicionar', **base_btn), sg.Button('Editar', **base_btn), sg.Button('Remover', **base_btn)],
-        [sg.Button('Buscar', **scan_btn, pad=(3, 30))],
+        [sg.Text('Diários selecionados:', font=("Arial", 12, "bold"), expand_x=True), sg.Input(key='-FILES-', enable_events=True, visible=False), sg.FilesBrowse('Carregar PDF Diário', **browse_btn, target='-FILES-', file_types=(("PDF Files", "*.pdf"),))],
+        [sg.Listbox(values=[], key='-SELECTED_FILES-', size=(20, 5), expand_x=True)],
+        [sg.Text('', size=(1, 1))],
+        [sg.Text('Nomes a serem buscados:', font=("Arial", 12, "bold"), expand_x=True), sg.Button('Adicionar', **base_btn), sg.Button('Editar', **base_btn), sg.Button('Remover', **base_btn)],
+        [sg.Listbox(values=names, key='-NAMES-', size=(20, 20), expand_x=True, enable_events=True)],
+        [sg.Text('', size=(1, 1))],
+        [sg.Button('Buscar', **scan_btn, expand_x=True)],
+        [sg.ProgressBar(max_value=100, orientation='h', size=(20, 20), key='progress', expand_x=True)],
     ]
 
-    window = sg.Window('Busca Diario', layout, finalize=True)
+    window = sg.Window('Busca Diario', layout, finalize=True, size=(700, 650))
 
     while True:
         event, values = window.read()
@@ -77,7 +80,7 @@ def main_window():
         elif event == 'Buscar':
             pdf_files = values['-FILES-'].split(';')
             selected_files = values['-SELECTED_FILES-']
-            scan_and_display_results(pdf_files, names)
+            scan_and_display_results(pdf_files, names, window)
         elif event == 'Adicionar':
             new_name = sg.popup_get_text('Digite um novo nome:')
             if new_name:
@@ -105,25 +108,46 @@ def main_window():
 
     window.close()
 
-def scan_and_display_results(pdf_files, names):
-    results = {}
+def scan_and_display_results(pdf_files, names, window):
+   results = {}
+   progress_bar = window['progress']
+   total_files = len(pdf_files)
+   
+   window['Buscar'].update(disabled=True, button_color=("#F4564F","white"))
+   for i, pdf_file in enumerate(pdf_files):
+       found_names = search_names_in_pdf(pdf_file, names)
+       results[pdf_file] = found_names
+       progress = (i + 1) / total_files * 100
+       progress_bar.UpdateBar(progress)
+    
+   window['Buscar'].update(disabled=False, button_color=("white","#F4564F"))
 
-    for pdf_file in pdf_files:
-        found_names = search_names_in_pdf(pdf_file, names)
-        results[pdf_file] = found_names
+   progress_bar.UpdateBar(0)
+   display_results(results)
 
-    display_results(results)
 
 def display_results(results):
-    result_text = ''
-    for pdf_file, found_names_dict in results.items():
-        result_text += f'___________________________\nDiario:   {pdf_file}\n'
-        for name, page_numbers in found_names_dict.items():
-            if page_numbers:
-                result_text += f'  {name}  -   Pág. {", ".join(map(str, page_numbers))}\n'
-        result_text += '\n'
+  result_text = ''
+  for pdf_file, found_names_dict in results.items():
+      result_text += f'___________________________\nDiario:  {pdf_file}\n'
+      for name, page_numbers in found_names_dict.items():
+          if page_numbers:
+              result_text += f' {name} -  Pág. {", ".join(map(str, page_numbers))}\n'
+      result_text += '\n'
 
-    sg.popup_scrolled(result_text, title='Resultados da Busca', size=(100, 40))
+  layout = [
+      [sg.Multiline(result_text, size=(80, 30))],
+  ]
+
+  window = sg.Window('Resultados da Busca', layout, finalize=True)
+
+  while True:
+      event, values = window.read()
+      if event == sg.WINDOW_CLOSED:
+          break
+
+  window.close()
+
 
 if __name__ == '__main__':
     main_window()
